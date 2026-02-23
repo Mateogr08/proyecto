@@ -1,0 +1,20 @@
+- Solicitante: El punto de partida. Es el estudiante o usuario que genera la necesidad.
+
+- Solicitud Académica: El concepto central que agrupa la descripción, el tipo, el canal y el estado.
+
+- Responsable: Usuario administrativo o docente activo encargado de procesar la solicitud.
+
+- Historial: El registro cronológico de todas las acciones realizadas sobre una solicitud.
+
+- Triage: El proceso de aplicar reglas de negocio para determinar la importancia y el tipo de trámite.
+
+
++ Relaciones principales:
+
+- Un Solicitante puede crear múltiples Solicitudes.
+
+- Una Solicitud tiene un ciclo de vida definido por varios Estados.
+
+- Una Solicitud puede tener un Responsable asignado a la vez.
+
+- Una Solicitud genera múltiples entradas en el Historial.

@@ -1,0 +1,14 @@
+- Validación de Transición de Estados: El sistema solo debe permitir cambios de estado que sean coherentes
+(ej. no se puede cerrar una solicitud que no ha sido atendida).
+
+- Condición de Cierre: Para cerrar una solicitud, esta debe estar en estado "Atendida" y contar obligatoriamente con una observación de cierre.
+
+- Inmutabilidad Post-Cierre: Una vez que una solicitud está en estado "Cerrada", no puede ser modificada bajo ninguna circunstancia.
+
+- Restricción de Asignación: Solo se pueden asignar solicitudes a responsables que se encuentren en estado "Activo".
+
+- Priorización Obligatoria: Toda prioridad asignada debe contar con una justificación registrada.
+
+- Independencia de la IA: El sistema debe ser capaz de clasificar y operar manualmente si el servicio de IA no está disponible.
+
+- Autorización por Rol: Ciertas operaciones (como cerrar o priorizar) están restringidas a roles específicos.
