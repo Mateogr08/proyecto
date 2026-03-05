@@ -1,52 +1,56 @@
 package co.edu.uniquindio.proyecto.domain.entity;
 
-import co.edu.uniquindio.proyecto.domain.valueobject.CodigoSolicitud;
-import co.edu.uniquindio.proyecto.domain.valueobject.EstadoSolicitud;
-import co.edu.uniquindio.proyecto.domain.valueobject.Prioridad;
-import co.edu.uniquindio.proyecto.domain.valueobject.TipoSolicitud;
-
+import co.edu.uniquindio.proyecto.domain.valueobject.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Solicitud {
     private final CodigoSolicitud id;
     private final LocalDateTime fechaCreacion;
+    private final TipoSolicitud tipo;
     private EstadoSolicitud estado;
     private Usuario responsable;
-    private final TipoSolicitud tipo;
     private Prioridad prioridad;
+    private final List<EventoHistorial> historial;
 
-    public Solicitud(CodigoSolicitud id, TipoSolicitud tipo, String descripcion) {
+    public Solicitud(CodigoSolicitud id, TipoSolicitud tipo) {
         this.id = id;
         this.tipo = tipo;
         this.estado = EstadoSolicitud.REGISTRADA;
         this.fechaCreacion = LocalDateTime.now();
+        this.historial = new ArrayList<>();
+        registrarEvento("Solicitud creada en el sistema");
     }
 
-    // Regla de Negocio: Asignar Responsable
+    public List<EventoHistorial> getHistorial() {
+        return Collections.unmodifiableList(historial);
+    }
+
+    public void marcarComoAtendida() {
+        validarModificable();
+        cambiarEstado(EstadoSolicitud.ATENDIDA);
+        registrarEvento("La solicitud ha sido marcada como atendida por el responsable.");
+    }
+
+    public void clasificar(Prioridad nuevaPrioridad) {
+        validarModificable();
+        this.prioridad = nuevaPrioridad;
+        cambiarEstado(EstadoSolicitud.CLASIFICADA);
+        registrarEvento("Solicitud clasificada con prioridad: " + nuevaPrioridad.nivel());
+    }
+
     public void asignarResponsable(Usuario nuevoResponsable) {
+        validarModificable();
         if (!nuevoResponsable.isActivo()) {
             throw new IllegalStateException("Solo se pueden asignar responsables activos");
         }
         this.responsable = nuevoResponsable;
-        this.estado = EstadoSolicitud.EN_ATENCION;
+        cambiarEstado(EstadoSolicitud.EN_ATENCION);
+        registrarEvento("Responsable asignado: " + nuevoResponsable.getIdentificacion());
     }
 
-    // Regla de Negocio: Cambiar Estado
-    public void cambiarEstado(EstadoSolicitud nuevoEstado) {
-        if (this.estado == EstadoSolicitud.CERRADA) {
-            throw new IllegalStateException("No se pueden realizar cambios en una solicitud ya cerrada");
-        }
-
-        if (!esTransicionValida(nuevoEstado)) {
-            throw new IllegalArgumentException(
-                    "Transición no permitida: de " + this.estado + " a " + nuevoEstado
-            );
-        }
-
-        this.estado = nuevoEstado;
-    }
-
-    // Regla de Negocio: Cerrar Solicitud
     public void cerrar(String observacionCierre) {
         if (this.estado != EstadoSolicitud.ATENDIDA) {
             throw new IllegalStateException("No se puede cerrar si no ha sido atendida");
@@ -55,9 +59,26 @@ public class Solicitud {
             throw new IllegalArgumentException("Se requiere una observación para el cierre");
         }
         this.estado = EstadoSolicitud.CERRADA;
+        registrarEvento("Solicitud cerrada: " + observacionCierre);
     }
 
-    //Lógica para validar el flujo del ciclo de vida
+    private void cambiarEstado(EstadoSolicitud nuevoEstado) {
+        if (!esTransicionValida(nuevoEstado)) {
+            throw new IllegalArgumentException("Transición no permitida a " + nuevoEstado);
+        }
+        this.estado = nuevoEstado;
+    }
+
+    private void registrarEvento(String descripcion) {
+        this.historial.add(new EventoHistorial(LocalDateTime.now(), descripcion, this.estado));
+    }
+
+    private void validarModificable() {
+        if (this.estado == EstadoSolicitud.CERRADA) {
+            throw new IllegalStateException("Una solicitud cerrada no puede modificarse"); // B.4 Invariante
+        }
+    }
+
     private boolean esTransicionValida(EstadoSolicitud nuevo) {
         return switch (this.estado) {
             case REGISTRADA -> nuevo == EstadoSolicitud.CLASIFICADA;
