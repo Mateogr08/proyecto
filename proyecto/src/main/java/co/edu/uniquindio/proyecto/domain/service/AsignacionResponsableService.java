@@ -7,7 +7,6 @@ import co.edu.uniquindio.proyecto.domain.exception.DomainException;
 public class AsignacionResponsableService {
 
     public void asignarTramite(Solicitud solicitud, Usuario responsable) {
-        // Regla: Validaciones cruzadas antes de ejecutar la acción en el agregado
         if (!responsable.isActivo()) {
             throw new DomainException("El responsable no puede recibir solicitudes porque está inactivo.");
         }

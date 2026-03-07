@@ -2,7 +2,7 @@ package co.edu.uniquindio.proyecto.domain.entity;
 
 import co.edu.uniquindio.proyecto.domain.valueobject.Email;
 
-public class Usuario {
+public abstract class Usuario {
     private final String identificacion;
     private final String nombreCompleto;
     private final Email email;
@@ -18,15 +18,9 @@ public class Usuario {
         this.activo = true;
     }
 
-    public boolean isActivo() {
-        return activo;
-    }
-    public String getIdentificacion() {
-        return identificacion;
-    }
+    public abstract String getRol();
 
-    // Metodo de negocio para cambiar estado sin usar setters directos
-    public void desactivar() {
-        this.activo = false;
-    }
+    public boolean isActivo() { return activo; }
+    public String getIdentificacion() { return identificacion; }
+    public void desactivar() { this.activo = false; }
 }

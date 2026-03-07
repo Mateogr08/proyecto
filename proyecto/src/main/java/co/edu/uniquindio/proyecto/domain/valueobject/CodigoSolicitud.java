@@ -5,7 +5,7 @@ public final class CodigoSolicitud {
 
     public CodigoSolicitud(String valor) {
         if (valor == null || !valor.matches("^[A-Z]{3}-\\d{4}$")) {
-            throw new IllegalArgumentException("Formato de código inválido (Ej: ACAD-1234)");
+            throw new IllegalArgumentException("Formato de código inválido (Ej: ABC-1234)");
         }
         this.valor = valor;
     }
