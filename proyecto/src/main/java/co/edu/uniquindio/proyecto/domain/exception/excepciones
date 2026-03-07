@@ -1,1 +1,0 @@
-- DomainException: Esta clase es una excepción personalizada que se lanza cuando se intenta realizar una acción que viola una regla de negocio.

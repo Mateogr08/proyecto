@@ -13,8 +13,21 @@ import co.edu.uniquindio.proyecto.domain.valueobject.TipoSolicitud;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Pruebas unitarias para {@link AsignacionResponsableService}.
+ *
+ * <p>Verifica que las reglas de negocio relacionadas con la asignación
+ * de responsables a una solicitud se cumplan correctamente.</p>
+ */
 class AsignacionServiceTest {
 
+    /**
+     * Verifica que no sea posible asignar una solicitud a un
+     * usuario que se encuentre inactivo.
+     *
+     * <p>El sistema debe lanzar una {@link DomainException} cuando
+     * se intenta realizar esta operación.</p>
+     */
     @Test
     void noDebeAsignarResponsableInactivo() {
         AsignacionResponsableService service = new AsignacionResponsableService();

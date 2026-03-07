@@ -1,7 +1,0 @@
-Entidades (Tienen identidad propia y ciclo de vida):
-
-- Solicitud: Su identidad persiste aunque cambie de estado.
-
-- Usuario: Personas con roles definidos e identidad única en el sistema.
-
-- EntradaHistorial: Cada evento registrado en la línea de tiempo de la solicitud.
