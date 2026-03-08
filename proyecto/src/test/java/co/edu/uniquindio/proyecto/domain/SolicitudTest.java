@@ -4,6 +4,7 @@ import co.edu.uniquindio.proyecto.domain.entity.Administrador;
 import co.edu.uniquindio.proyecto.domain.entity.Estudiante;
 import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
 import co.edu.uniquindio.proyecto.domain.entity.Usuario;
+import co.edu.uniquindio.proyecto.domain.exception.DomainException;
 import co.edu.uniquindio.proyecto.domain.valueobject.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,62 @@ class SolicitudTest {
         estudiante = new Estudiante("1010", "Pepe", new Email("p@u.co"));
         admin = new Administrador("1", "Admin", new Email("admin@u.co"));
         solicitud = new Solicitud(id, tipo, "Descripción de prueba", CanalOrigen.CORREO, estudiante);
+    }
+
+    /**
+     * Verifica que no sea posible clasificar una solicitud
+     * si esta no se encuentra en estado REGISTRADA.
+     *
+     * <p>Después de clasificar una solicitud una vez,
+     * intentar clasificarla nuevamente debe generar
+     * una excepción.</p>
+     */
+    @Test
+    void noDebeClasificarSiNoEstaRegistrada() {
+
+        Prioridad prioridad = new Prioridad("MEDIA", "Justificación válida de prueba");
+
+        solicitud.clasificar(prioridad);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            solicitud.clasificar(prioridad);
+        });
+    }
+
+    /**
+     * Verifica que una solicitud solo pueda pasar a estado
+     * EN_ATENCION si previamente ha sido clasificada.
+     *
+     * <p>Si se intenta asignar un responsable cuando la solicitud
+     * aún no ha sido clasificada, el sistema debe lanzar
+     * una excepción.</p>
+     */
+    @Test
+    void noDebeAsignarResponsableSiNoEstaClasificada() {
+
+        Usuario responsable = new Administrador("2", "Responsable", new Email("resp@u.co"));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            solicitud.asignarResponsable(responsable);
+        });
+    }
+
+    /**
+     * Verifica que una solicitud solo pueda marcarse como
+     * ATENDIDA si previamente se encuentra en estado
+     * EN_ATENCION.
+     *
+     * <p>Si la solicitud no tiene un responsable asignado,
+     * el sistema debe impedir el cambio de estado.</p>
+     */
+    @Test
+    void noDebeMarcarAtendidaSiNoEstaEnAtencion() {
+
+        solicitud.clasificar(new Prioridad("MEDIA", "Justificación válida"));
+
+        assertThrows(IllegalStateException.class, () -> {
+            solicitud.marcarComoAtendida();
+        });
     }
 
     /**
