@@ -35,3 +35,6 @@ Stack Tecnológico:
 - Backend: Java (Spring Boot)
 - Frontend: TypeScript (Angular)
 - Arquitectura: API REST con persistencia ORM.
+
+Documentación:
+La documentación del proyecto se encuentra en: proyecto\src\main\java\co\edu\uniquindio\proyecto\docs
