@@ -17,5 +17,6 @@ public enum CanalOrigen {
     CORREO,
     SAC,
     TELEFONICO,
+    WEB,
     PRESENCIAL
 }

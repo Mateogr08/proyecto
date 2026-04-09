@@ -1,46 +1,47 @@
 package co.edu.uniquindio.proyecto.domain.service;
 
-import co.edu.uniquindio.proyecto.domain.valueobject.Prioridad;
+import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
 import co.edu.uniquindio.proyecto.domain.valueobject.TipoSolicitud;
 
 /**
- * Servicio de dominio encargado de determinar la prioridad sugerida
- * para una solicitud.
- *
- * <p>Este servicio utiliza una estrategia de sugerencia representada
- * por la interfaz {@link SugeridorPrioridad}, lo que permite aplicar
- * diferentes mecanismos de cálculo de prioridad, como reglas de negocio
- * o análisis mediante inteligencia artificial.</p>
+ * Servicio que clasifica solicitudes automáticamente según
+ * palabras clave en la descripción de la solicitud.
  */
-
-public class ClasificadorSolicitudService {
-
-    private final SugeridorPrioridad sugeridor;
+public class ClasificacionSolicitudService {
 
     /**
-     * Crea un nuevo clasificador de solicitudes utilizando un
-     * sugeridor de prioridad específico.
+     * Clasifica la solicitud según su descripción.
      *
-     * @param sugeridor componente encargado de sugerir la prioridad
-     * de una solicitud
+     * @param solicitud solicitud a clasificar
+     * @return tipo de solicitud detectado
+     * @throws IllegalArgumentException si no se puede determinar el tipo
      */
-    public ClasificadorSolicitudService(SugeridorPrioridad sugeridor) {
-        this.sugeridor = sugeridor;
-    }
+    public TipoSolicitud clasificar(Solicitud solicitud) {
+        if (solicitud == null)
+            throw new IllegalArgumentException("La solicitud no puede ser null");
 
-    /**
-     * Calcula la prioridad sugerida para una solicitud basándose
-     * en su descripción y tipo.
-     *
-     * <p>La lógica de cálculo se delega al componente
-     * {@link SugeridorPrioridad}, lo que permite cambiar la
-     * estrategia de sugerencia sin modificar este servicio.</p>
-     *
-     * @param descripcion descripción de la solicitud
-     * @param tipo tipo de solicitud académica
-     * @return prioridad sugerida para la solicitud
-     */
-    public Prioridad calcularPrioridadSugerida(String descripcion, TipoSolicitud tipo) {
-        return sugeridor.sugerir(descripcion, tipo);
+        String desc = solicitud.getDescripcion();
+        if (desc == null || desc.isBlank())
+            throw new IllegalArgumentException("La descripción de la solicitud es obligatoria");
+
+        desc = desc.toLowerCase();
+
+        // Palabras clave para determinar el tipo
+        if (desc.contains("homologar") || desc.contains("homologación"))
+            return TipoSolicitud.HOMOLOGACION;
+        if (desc.contains("registro") || desc.contains("matrícula"))
+            return TipoSolicitud.REGISTRO_ASIGNATURAS;
+        if (desc.contains("cancelar") || desc.contains("cancelación"))
+            return TipoSolicitud.CANCELACION;
+        if (desc.contains("cupo"))
+            return TipoSolicitud.CUPO;
+        if (desc.contains("consulta"))
+            return TipoSolicitud.CONSULTA;
+
+        // Si no coincide con ningún tipo conocido, lanza excepción clara
+        throw new IllegalArgumentException(
+                "No se pudo clasificar la solicitud: '" + solicitud.getDescripcion() +
+                        "'. Por favor revise las palabras clave"
+        );
     }
 }

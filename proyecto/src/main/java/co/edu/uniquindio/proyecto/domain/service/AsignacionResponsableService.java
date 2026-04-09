@@ -2,36 +2,20 @@ package co.edu.uniquindio.proyecto.domain.service;
 
 import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
 import co.edu.uniquindio.proyecto.domain.entity.Usuario;
-import co.edu.uniquindio.proyecto.domain.exception.DomainException;
 
-/**
- * Servicio de dominio encargado de gestionar la asignación de
- * responsables a una solicitud.
- *
- * <p>Este servicio contiene reglas de negocio que deben validarse
- * antes de delegar la operación al agregado {@link Solicitud}.
- * En particular, verifica que el usuario responsable esté activo
- * antes de permitir la asignación.</p>
- */
+import java.util.List;
 
 public class AsignacionResponsableService {
 
     /**
-     * Asigna un responsable para atender una solicitud.
-     *
-     * <p>Antes de realizar la asignación se valida que el usuario
-     * responsable esté activo. Si la validación es correcta, la
-     * operación se delega a la entidad {@link Solicitud}.</p>
-     *
-     * @param solicitud solicitud a la cual se le asignará el responsable
-     * @param responsable usuario encargado de atender la solicitud
-     *
-     * @throws DomainException si el responsable se encuentra inactivo
+     * Asigna un responsable a la solicitud según reglas de carga de trabajo.
      */
-    public void asignarTramite(Solicitud solicitud, Usuario responsable) {
-        if (!responsable.isActivo()) {
-            throw new DomainException("El responsable no puede recibir solicitudes porque está inactivo.");
+    public void asignarResponsable(Solicitud solicitud, List<Usuario> responsables) {
+        // Ejemplo simple: asigna el primero disponible
+        if(responsables.isEmpty()) {
+            throw new IllegalArgumentException("No hay responsables disponibles");
         }
-        solicitud.asignarResponsable(responsable);
+        Usuario asignado = responsables.get(0);
+        solicitud.setResponsable(asignado);
     }
 }
