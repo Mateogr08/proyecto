@@ -3,15 +3,17 @@ package co.edu.uniquindio.proyecto.application.dto.request;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * DTO para asignar responsable a una solicitud.
+ * DTO para reasignar el responsable de una solicitud.
+ *
+ * <p>Permite cambiar el usuario encargado de la atención.</p>
  */
-public record AsignarResponsableRequest(
+public record ReasignarResponsableRequest(
 
         @NotBlank(message = "El ID de la solicitud es obligatorio")
         String idSolicitud,
 
-        @NotBlank(message = "El ID del responsable es obligatorio")
-        String idResponsable,
+        @NotBlank(message = "El nuevo responsable es obligatorio")
+        String nuevoResponsableId,
 
         @NotBlank(message = "El actor es obligatorio")
         String idActor

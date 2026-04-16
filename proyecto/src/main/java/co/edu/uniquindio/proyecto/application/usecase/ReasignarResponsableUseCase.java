@@ -4,29 +4,25 @@ import co.edu.uniquindio.proyecto.domain.entity.*;
 import co.edu.uniquindio.proyecto.domain.repository.SolicitudRepository;
 import co.edu.uniquindio.proyecto.domain.service.AsignacionResponsableService;
 
-public class AsignarResponsableUseCase {
+public class ReasignarResponsableUseCase {
 
     private final SolicitudRepository repository;
     private final AsignacionResponsableService service;
 
-    public AsignarResponsableUseCase(SolicitudRepository repository,
-                                     AsignacionResponsableService service) {
+    public ReasignarResponsableUseCase(SolicitudRepository repository,
+                                       AsignacionResponsableService service) {
         this.repository = repository;
         this.service = service;
     }
 
     /**
-     * Asigna un responsable a una solicitud previamente clasificada.
-     *
-     * @param idSolicitud id de la solicitud
-     * @param responsable usuario responsable
-     * @param actor usuario que ejecuta la acción
+     * Permite reasignar el responsable de una solicitud.
      */
-    public void ejecutar(String idSolicitud, Usuario responsable, Usuario actor) {
+    public void ejecutar(String idSolicitud, Usuario nuevo, Usuario actor) {
 
         Solicitud solicitud = repository.buscarPorId(idSolicitud);
 
-        service.asignarResponsable(solicitud, responsable, actor);
+        service.reasignarResponsable(solicitud, nuevo, actor);
 
         repository.guardar(solicitud);
     }

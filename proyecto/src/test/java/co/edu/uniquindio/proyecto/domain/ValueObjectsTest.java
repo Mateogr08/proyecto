@@ -4,57 +4,141 @@ import co.edu.uniquindio.proyecto.domain.valueobject.CodigoSolicitud;
 import co.edu.uniquindio.proyecto.domain.valueobject.Email;
 import co.edu.uniquindio.proyecto.domain.valueobject.Prioridad;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Pruebas unitarias para los Value Objects del dominio.
  *
- * <p>Esta clase valida las reglas de negocio y restricciones
- * definidas en los objetos de valor como Email, CodigoSolicitud
- * y Prioridad. Se comprueba que los datos válidos sean aceptados
- * y que los datos inválidos generen las excepciones correspondientes.</p>
+ * <p>Estas pruebas validan las reglas de negocio, restricciones
+ * e invariantes definidas en los objetos de valor:</p>
+ *
+ * <ul>
+ *     <li>{@link Email}</li>
+ *     <li>{@link CodigoSolicitud}</li>
+ *     <li>{@link Prioridad}</li>
+ * </ul>
+ *
+ * <p>Se verifica que:</p>
+ * <ul>
+ *     <li>Los valores válidos sean aceptados correctamente</li>
+ *     <li>Los valores inválidos generen excepciones</li>
+ *     <li>Se mantenga la integridad del dominio</li>
+ * </ul>
  */
 class ValueObjectsTest {
 
+    // =============================================================================================
+    // ---------------------------------------- EMAIL ----------------------------------------------
+    // =============================================================================================
+
     /**
-     * Verifica que el objeto de valor {@link Email} valide correctamente
-     * el formato de una dirección de correo electrónico.
-     *
-     * <p>Se espera que un correo con formato válido sea aceptado y que
-     * un correo con formato inválido lance una excepción.</p>
+     * Verifica que se pueda crear un Email válido correctamente.
      */
     @Test
-    void emailDebeValidarFormatoCorrecto() {
+    void deberiaCrearEmailValido() {
         Email email = new Email("test@uniquindio.edu.co");
+
         assertEquals("test@uniquindio.edu.co", email.getDireccion());
-
-        assertThrows(IllegalArgumentException.class, () -> new Email("correo-sin-arroba"));
     }
 
     /**
-     * Verifica que el objeto de valor {@link CodigoSolicitud}
-     * cumpla con el patrón establecido para los códigos.
-     *
-     * <p>Un código válido debe seguir el formato definido
-     * por el sistema, mientras que uno inválido debe generar
-     * una excepción.</p>
+     * Verifica que un email con formato inválido lance excepción.
      */
     @Test
-    void codigoSolicitudDebeCumplirPatron() {
-        assertDoesNotThrow(() -> new CodigoSolicitud("ACA-1234"));
-        assertThrows(IllegalArgumentException.class, () -> new CodigoSolicitud("123-ABCD"));
+    void noDebeCrearEmailInvalido() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Email("correo-sin-arroba")
+        );
     }
 
     /**
-     * Verifica que el objeto de valor {@link Prioridad}
-     * requiera una justificación con longitud suficiente.
-     *
-     * <p>Si la justificación es demasiado corta, el sistema
-     * debe lanzar una excepción para evitar datos inválidos
-     * en el dominio.</p>
+     * Verifica que no se permita un email nulo o vacío.
      */
     @Test
-    void prioridadDebeTenerJustificacionLarga() {
-        assertThrows(IllegalArgumentException.class, () -> new Prioridad("ALTA", "Corta"));
+    void noDebeCrearEmailVacioONulo() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Email("")
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+                new Email(null)
+        );
+    }
+
+    // =============================================================================================
+    // ----------------------------------- CODIGO SOLICITUD ----------------------------------------
+    // =============================================================================================
+
+    /**
+     * Verifica que se pueda crear un código de solicitud válido.
+     */
+    @Test
+    void deberiaCrearCodigoSolicitudValido() {
+        assertDoesNotThrow(() ->
+                new CodigoSolicitud("SOL-123")
+        );
+    }
+
+    /**
+     * Verifica que un código con formato inválido lance excepción.
+     */
+    @Test
+    void noDebeCrearCodigoSolicitudInvalido() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new CodigoSolicitud("123-ABC")
+        );
+    }
+
+    /**
+     * Verifica que no se permita un código nulo o vacío.
+     */
+    @Test
+    void noDebeCrearCodigoSolicitudVacioONulo() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new CodigoSolicitud("")
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+                new CodigoSolicitud(null)
+        );
+    }
+
+    // =============================================================================================
+    // ---------------------------------------- PRIORIDAD ------------------------------------------
+    // =============================================================================================
+
+    /**
+     * Verifica que se pueda crear una prioridad válida.
+     */
+    @Test
+    void deberiaCrearPrioridadValida() {
+        assertDoesNotThrow(() ->
+                new Prioridad("ALTA", "Impacta el proceso académico del estudiante")
+        );
+    }
+
+    /**
+     * Verifica que una prioridad con justificación corta lance excepción.
+     */
+    @Test
+    void noDebeCrearPrioridadConJustificacionCorta() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Prioridad("ALTA", "Corta")
+        );
+    }
+
+    /**
+     * Verifica que no se permita una prioridad con valores nulos.
+     */
+    @Test
+    void noDebeCrearPrioridadConValoresNulos() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Prioridad(null, "Justificación válida")
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+                new Prioridad("ALTA", null)
+        );
     }
 }

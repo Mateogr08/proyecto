@@ -3,14 +3,21 @@ package co.edu.uniquindio.proyecto.application.dto.request;
 import jakarta.validation.constraints.*;
 
 /**
- * DTO para clasificar una solicitud
- * Mapea a: Solicitud.clasificar()
- *
- * Solo se permite clasificar solicitudes en estado REGISTRADA
- * La clasificación define la prioridad de atención
+ * DTO para clasificar una solicitud.
  */
 public record ClasificarSolicitudRequest(
 
-        @NotNull(message = "La prioridad es obligatoria")
-        Long prioridadId
+        @NotBlank(message = "El ID de la solicitud es obligatorio")
+        String idSolicitud,
+
+        @NotBlank(message = "El nombre de la prioridad es obligatorio")
+        String nombrePrioridad,
+
+        @NotBlank(message = "La justificación es obligatoria")
+        @Size(min = 10, message = "Debe tener al menos 10 caracteres")
+        String justificacion,
+
+        @NotBlank(message = "El actor es obligatorio")
+        String idActor
+
 ) {}

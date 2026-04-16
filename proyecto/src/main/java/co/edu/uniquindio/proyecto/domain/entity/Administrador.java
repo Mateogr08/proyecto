@@ -3,20 +3,24 @@ package co.edu.uniquindio.proyecto.domain.entity;
 import co.edu.uniquindio.proyecto.domain.valueobject.Email;
 
 /**
- * Representa un usuario con rol de administrador dentro del sistema.
+ * Representa un administrador dentro del sistema.
  *
- * <p>El administrador es un tipo de {@link Usuario} que posee permisos
- * especiales para gestionar solicitudes dentro del sistema, como
- * realizar su cierre una vez hayan sido atendidas.</p>
+ * <p>El administrador es un usuario con privilegios elevados,
+ * encargado de gestionar el sistema y tomar decisiones clave
+ * dentro del flujo de solicitudes, como asignaciones o cambios de estado.</p>
  *
- * <p>Esta clase especializa el comportamiento de Usuario indicando
- * que su rol corresponde a <b>ADMINISTRADOR</b>.</p>
+ * <p>Hereda los atributos y comportamientos comunes definidos en {@link Usuario}.</p>
  */
-
 public class Administrador extends Usuario {
-    public Administrador(String id, String nombre, Email email) {
-        super(id, nombre, email);
+
+    /**
+     * Crea un nuevo administrador.
+     *
+     * @param identificacion identificador único del administrador
+     * @param nombreCompleto nombre completo del administrador
+     * @param email correo electrónico del administrador
+     */
+    public Administrador(String identificacion, String nombreCompleto, Email email) {
+        super(identificacion, nombreCompleto, email);
     }
-    @Override
-    public String getRol() { return "ADMINISTRADOR"; }
 }

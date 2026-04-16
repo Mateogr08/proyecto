@@ -4,29 +4,25 @@ import co.edu.uniquindio.proyecto.domain.entity.*;
 import co.edu.uniquindio.proyecto.domain.repository.SolicitudRepository;
 import co.edu.uniquindio.proyecto.domain.service.GestionSolicitudService;
 
-public class CerrarSolicitudUseCase {
+public class RechazarSolicitudUseCase {
 
     private final SolicitudRepository repository;
     private final GestionSolicitudService service;
 
-    public CerrarSolicitudUseCase(SolicitudRepository repository,
-                                  GestionSolicitudService service) {
+    public RechazarSolicitudUseCase(SolicitudRepository repository,
+                                    GestionSolicitudService service) {
         this.repository = repository;
         this.service = service;
     }
 
     /**
-     * Cierra una solicitud atendida.
-     *
-     * @param idSolicitud id de la solicitud
-     * @param observacion observación de cierre
-     * @param actor usuario que ejecuta la acción
+     * Rechaza una solicitud clasificada.
      */
-    public void ejecutar(String idSolicitud, String observacion, Usuario actor) {
+    public void ejecutar(String idSolicitud, String motivo, Usuario actor) {
 
         Solicitud solicitud = repository.buscarPorId(idSolicitud);
 
-        service.cerrarSolicitud(solicitud, observacion, actor);
+        service.rechazarSolicitud(solicitud, motivo, actor);
 
         repository.guardar(solicitud);
     }

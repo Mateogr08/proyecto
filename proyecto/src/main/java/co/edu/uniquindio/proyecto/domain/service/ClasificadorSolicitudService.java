@@ -1,47 +1,44 @@
 package co.edu.uniquindio.proyecto.domain.service;
-
-import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
-import co.edu.uniquindio.proyecto.domain.valueobject.TipoSolicitud;
+import co.edu.uniquindio.proyecto.domain.entity.*;
+import co.edu.uniquindio.proyecto.domain.valueobject.Prioridad;
 
 /**
- * Servicio que clasifica solicitudes automáticamente según
- * palabras clave en la descripción de la solicitud.
+ * Servicio de dominio encargado de la clasificación de solicitudes.
+ *
+ * <p>Este servicio gestiona la asignación de prioridad a una solicitud,
+ * asegurando que únicamente usuarios con rol de administrador puedan
+ * ejecutar esta acción.</p>
+ *
+ * <p>Centraliza las reglas de negocio relacionadas con la clasificación,
+ * separando las responsabilidades de autorización del agregado raíz.</p>
  */
-public class ClasificacionSolicitudService {
+
+
+public class ClasificadorSolicitudService {
 
     /**
-     * Clasifica la solicitud según su descripción.
+     * Clasifica una solicitud asignándole una prioridad.
+     *
+     * <p>Reglas de negocio:</p>
+     * <ul>
+     * <li>Solo un usuario con rol de administrador puede clasificar solicitudes.</li>
+     * <li>La prioridad debe ser válida (no nula).</li>
+     * <li>La solicitud debe encontrarse en estado REGISTRADA (validado en la entidad).</li>
+     * </ul>
      *
      * @param solicitud solicitud a clasificar
-     * @return tipo de solicitud detectado
-     * @throws IllegalArgumentException si no se puede determinar el tipo
+     * @param prioridad prioridad a asignar
+     * @param actor usuario que ejecuta la acción
+     *
+     * @throws IllegalStateException si el usuario no es administrador
+     * @throws IllegalArgumentException si la prioridad es inválida
      */
-    public TipoSolicitud clasificar(Solicitud solicitud) {
-        if (solicitud == null)
-            throw new IllegalArgumentException("La solicitud no puede ser null");
+    public void clasificarSolicitud(Solicitud solicitud, Prioridad prioridad, Usuario actor) {
 
-        String desc = solicitud.getDescripcion();
-        if (desc == null || desc.isBlank())
-            throw new IllegalArgumentException("La descripción de la solicitud es obligatoria");
+        if (!actor.esAdministrador()) {
+            throw new IllegalStateException("Solo un administrador puede clasificar solicitudes");
+        }
 
-        desc = desc.toLowerCase();
-
-        // Palabras clave para determinar el tipo
-        if (desc.contains("homologar") || desc.contains("homologación"))
-            return TipoSolicitud.HOMOLOGACION;
-        if (desc.contains("registro") || desc.contains("matrícula"))
-            return TipoSolicitud.REGISTRO_ASIGNATURAS;
-        if (desc.contains("cancelar") || desc.contains("cancelación"))
-            return TipoSolicitud.CANCELACION;
-        if (desc.contains("cupo"))
-            return TipoSolicitud.CUPO;
-        if (desc.contains("consulta"))
-            return TipoSolicitud.CONSULTA;
-
-        // Si no coincide con ningún tipo conocido, lanza excepción clara
-        throw new IllegalArgumentException(
-                "No se pudo clasificar la solicitud: '" + solicitud.getDescripcion() +
-                        "'. Por favor revise las palabras clave"
-        );
+        solicitud.clasificar(prioridad);
     }
 }

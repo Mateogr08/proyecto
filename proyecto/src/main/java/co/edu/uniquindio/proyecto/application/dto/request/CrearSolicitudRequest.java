@@ -3,31 +3,26 @@ package co.edu.uniquindio.proyecto.application.dto.request;
 import jakarta.validation.constraints.*;
 
 /**
- * DTO para crear una nueva solicitud
- * Mapea a: Solicitud.crear()
+ * DTO para la creación de una solicitud.
  *
- * NO incluir:
- * - estado
- * - fechaCreacion
- * - id
- * - titulo
- *
- * Estos los gestiona el dominio automáticamente
+ * <p>Incluye validaciones de entrada para garantizar que los datos
+ * enviados por el cliente cumplan con las reglas mínimas antes de
+ * llegar al dominio.</p>
  */
 public record CrearSolicitudRequest(
+
+        @NotBlank(message = "El tipo de solicitud es obligatorio")
+        String tipo,
 
         @NotBlank(message = "La descripción es obligatoria")
         @Size(min = 20, max = 1000,
                 message = "La descripción debe tener entre 20 y 1000 caracteres")
         String descripcion,
 
-        @NotNull(message = "El tipo de solicitud es obligatorio")
-        Long tipoSolicitudId,
+        @NotBlank(message = "El canal es obligatorio")
+        String canal,
 
-        @NotNull(message = "La prioridad es obligatoria")
-        Long prioridadId,
+        @NotBlank(message = "El ID del solicitante es obligatorio")
+        String idSolicitante
 
-        @NotBlank(message = "El email del solicitante es obligatorio")
-        @Email(message = "Debe ser un email válido")
-        String emailSolicitante
 ) {}

@@ -8,20 +8,30 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Pruebas unitarias para la clase {@link Solicitud}.
+ * Pruebas unitarias para la entidad {@link Solicitud}.
  *
- * <p>Valida el ciclo de vida de una solicitud, sus transiciones de estado,
- * y las restricciones según el rol del usuario.</p>
+ * <p>Estas pruebas validan exclusivamente las reglas internas del agregado,
+ * tales como:
+ * <ul>
+ *     <li>Creación de la solicitud</li>
+ *     <li>Transiciones de estado</li>
+ *     <li>Restricciones propias del ciclo de vida</li>
+ * </ul>
+ *
+ * <p>No se validan reglas de autorización ni roles de usuario, ya que dichas
+ * responsabilidades pertenecen a los servicios de dominio.</p>
  */
 class SolicitudTest {
 
     private Solicitud solicitud;
     private Estudiante estudiante;
-    private Administrador admin;
     private Profesor profesor;
 
     /**
-     * Configuración inicial antes de cada prueba.
+     * Configuración inicial para cada prueba.
+     *
+     * <p>Se crea un estudiante válido y una solicitud en estado inicial
+     * REGISTRADA.</p>
      */
     @BeforeEach
     void setUp() {
@@ -29,12 +39,6 @@ class SolicitudTest {
                 "123",
                 "Juan Pérez",
                 new Email("juan@uniquindio.edu.co")
-        );
-
-        admin = new Administrador(
-                "admin1",
-                "Ana Admin",
-                new Email("admin@uniquindio.edu.co")
         );
 
         profesor = new Profesor(
@@ -53,20 +57,19 @@ class SolicitudTest {
     }
 
     // =============================================================================================
-    // ------------------------------------CREACIÓN DE LA SOLICITUD---------------------------------
+    // ------------------------------------ CREACIÓN -----------------------------------------------
     // =============================================================================================
 
     /**
-     * Verifica que la solicitud se crea correctamente.
+     * Verifica que la solicitud se crea correctamente en estado REGISTRADA.
      */
     @Test
     void deberiaCrearSolicitudCorrectamente() {
         assertEquals(EstadoSolicitud.REGISTRADA, solicitud.getEstado());
-        assertFalse(solicitud.getHistorial().isEmpty());
     }
 
     /**
-     * No permite crear sin descripción.
+     * No permite crear una solicitud sin descripción.
      */
     @Test
     void noDebeCrearSolicitudSinDescripcion() {
@@ -82,308 +85,237 @@ class SolicitudTest {
     }
 
     /**
-     * Solo estudiantes pueden crear solicitudes.
+     * Solo un estudiante puede crear solicitudes.
      */
     @Test
     void noDebeCrearSolicitudSiNoEsEstudiante() {
+        Profesor profesor = new Profesor(
+                "1",
+                "Profe",
+                new Email("profe@uni.com")
+        );
+
         assertThrows(IllegalArgumentException.class, () ->
                 new Solicitud(
                         new CodigoSolicitud("1"),
                         TipoSolicitud.CUPO,
                         "Descripción válida",
                         CanalOrigen.WEB,
-                        admin
+                        profesor
                 )
         );
     }
 
-    // ==============================================================================================
-    // ----------------------------------------CLASIFICAR SOLICITUD---------------------------------
-    // ==============================================================================================
+    // =============================================================================================
+    // ------------------------------------ CLASIFICACIÓN ------------------------------------------
+    // =============================================================================================
 
     /**
-     * Un administrador puede clasificar la solicitud.
+     * Permite clasificar una solicitud en estado REGISTRADA.
      */
     @Test
-    void adminDeberiaClasificarSolicitud() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Impacta directamente el proceso académico del estudiante"
-        );
-
-        solicitud.clasificar(prioridad, admin);
+    void deberiaClasificarSolicitud() {
+        solicitud.clasificar(new Prioridad("ALTA", "Impacto crítico"));
 
         assertEquals(EstadoSolicitud.CLASIFICADA, solicitud.getEstado());
     }
 
     /**
-     * Un usuario no administrador no puede clasificar.
+     * No permite clasificar si la solicitud no está en estado REGISTRADA.
      */
     @Test
-    void noAdminNoPuedeClasificar() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Impacta directamente el proceso académico del estudiante"
-        );
+    void noDebeClasificarSiNoEstaEnRegistrada() {
+        solicitud.clasificar(new Prioridad("ALTA", "Impacto crítico"));
 
         assertThrows(IllegalStateException.class, () ->
-                solicitud.clasificar(prioridad, estudiante)
+                solicitud.clasificar(new Prioridad("MEDIA", "Otro"))
         );
     }
 
-    // ===============================================================================================
-    // _____________________________________ASIGNAR RESPONSABLE A LA SOLICITUD_________________________
-    // ===============================================================================================
+    // =============================================================================================
+    // ------------------------------------ ASIGNACIÓN ---------------------------------------------
+    // =============================================================================================
 
     /**
-     * Verifica asignación correcta de responsable.
+     * Permite asignar un responsable cuando la solicitud está clasificada.
      */
     @Test
-    void deberiaAsignarResponsableCorrectamente() {
-        Prioridad prioridad = new Prioridad(
-                "MEDIA",
-                "Requiere atención en el corto plazo sin urgencia crítica"
-        );
-
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
+    void deberiaAsignarResponsable() {
+        solicitud.clasificar(new Prioridad("MEDIA", "Normal"));
+        solicitud.asignarResponsable(profesor);
 
         assertEquals(EstadoSolicitud.EN_ATENCION, solicitud.getEstado());
     }
 
     /**
-     * No permite asignar responsable sin clasificar.
+     * No permite asignar responsable si la solicitud no está clasificada.
      */
     @Test
-    void noDebeAsignarSiNoEstaClasificada() {
+    void noDebeAsignarResponsableSinClasificar() {
         assertThrows(IllegalStateException.class, () ->
-                solicitud.asignarResponsable(profesor, admin)
+                solicitud.asignarResponsable(profesor)
         );
     }
 
-    // ===============================================================================================
-    // -------------------------------------------ATENDER LA SOLICITUD--------------------------------
-    // ===============================================================================================
+    // =============================================================================================
+    // ------------------------------------ ATENCIÓN -----------------------------------------------
+    // =============================================================================================
 
     /**
-     * El responsable puede marcar la solicitud como atendida.
+     * Permite marcar la solicitud como atendida si está en atención.
      */
     @Test
-    void responsableDebeMarcarComoAtendida() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Bloquea un proceso académico importante"
-        );
+    void deberiaMarcarComoAtendida() {
+        solicitud.clasificar(new Prioridad("ALTA", "Urgente"));
+        solicitud.asignarResponsable(profesor);
 
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
-
-        solicitud.marcarComoAtendida(profesor);
+        solicitud.marcarComoAtendida();
 
         assertEquals(EstadoSolicitud.ATENDIDA, solicitud.getEstado());
     }
 
-    /**
-     * Otro usuario no puede atender la solicitud.
-     */
-    @Test
-    void otroUsuarioNoDebeAtender() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Bloquea un proceso académico importante"
-        );
-
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
-
-        assertThrows(IllegalStateException.class, () ->
-                solicitud.marcarComoAtendida(admin)
-        );
-    }
-
-    // ============================================================================================
-    // ---------------------------------------CERRAR LA SOLICITUD---------------------------------
-    // ============================================================================================
+    // =============================================================================================
+    // ------------------------------------ CIERRE -------------------------------------------------
+    // =============================================================================================
 
     /**
-     * Un administrador puede cerrar la solicitud.
+     * Permite cerrar una solicitud que ha sido atendida.
      */
     @Test
-    void adminDebeCerrarSolicitud() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Requiere solución inmediata por impacto académico"
-        );
+    void deberiaCerrarSolicitud() {
+        solicitud.clasificar(new Prioridad("ALTA", "Urgente"));
+        solicitud.asignarResponsable(profesor);
+        solicitud.marcarComoAtendida();
 
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
-        solicitud.marcarComoAtendida(profesor);
-
-        solicitud.cerrar("Caso resuelto correctamente", admin);
+        solicitud.cerrar("Caso resuelto");
 
         assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
     }
 
     /**
-     * No se puede cerrar sin haber sido atendida.
+     * No permite cerrar si la solicitud no ha sido atendida.
      */
     @Test
-    void noDebeCerrarSinAtender() {
-        Prioridad prioridad = new Prioridad(
-                "MEDIA",
-                "No es urgente pero requiere atención"
-        );
-
-        solicitud.clasificar(prioridad, admin);
+    void noDebeCerrarSinEstarAtendida() {
+        solicitud.clasificar(new Prioridad("MEDIA", "Normal"));
 
         assertThrows(IllegalStateException.class, () ->
-                solicitud.cerrar("Observación válida de cierre", admin)
+                solicitud.cerrar("Observación")
         );
     }
 
-    // ================================================================================================
-    // ------------------------------------------CANCELAR LA SOLICITUD--------------------------------
-    // ================================================================================================
+    // =============================================================================================
+    // ------------------------------------ CANCELACIÓN --------------------------------------------
+    // =============================================================================================
 
     /**
-     * El estudiante solicitante puede cancelar.
+     * Permite cancelar una solicitud en estados válidos.
      */
     @Test
-    void estudianteDebeCancelar() {
-        solicitud.cancelar("Ya no es necesaria la solicitud", estudiante);
+    void deberiaCancelarSolicitud() {
+        solicitud.cancelar("Ya no es necesaria");
 
         assertEquals(EstadoSolicitud.CANCELADA, solicitud.getEstado());
     }
 
     /**
-     * El administrador puede cancelar.
+     * No permite cancelar una solicitud cerrada.
      */
     @Test
-    void adminPuedeCancelar() {
-        solicitud.cancelar("Cancelación administrativa válida", admin);
+    void noDebeCancelarSiEstaCerrada() {
+        solicitud.clasificar(new Prioridad("ALTA", "Urgente"));
+        solicitud.asignarResponsable(profesor);
+        solicitud.marcarComoAtendida();
+        solicitud.cerrar("ok");
 
-        assertEquals(EstadoSolicitud.CANCELADA, solicitud.getEstado());
-    }
-
-    /**
-     * Usuario no autorizado no puede cancelar.
-     */
-    @Test
-    void noDebeCancelarUsuarioNoValido() {
         assertThrows(IllegalStateException.class, () ->
-                solicitud.cancelar("Motivo válido de cancelación", profesor)
+                solicitud.cancelar("Motivo")
         );
     }
 
-    // ==========================================================================================
-    // -------------------------------------RECHAZAR LA SOLICITUD---------------------------------
-    // ===========================================================================================
+    // =============================================================================================
+    // ------------------------------------ RECHAZO ------------------------------------------------
+    // =============================================================================================
 
     /**
-     * Un administrador puede rechazar la solicitud.
+     * Permite rechazar una solicitud clasificada.
      */
     @Test
-    void adminDebeRechazar() {
-        Prioridad prioridad = new Prioridad(
-                "BAJA",
-                "No cumple con los criterios establecidos"
-        );
+    void deberiaRechazarSolicitud() {
+        solicitud.clasificar(new Prioridad("BAJA", "No aplica"));
 
-        solicitud.clasificar(prioridad, admin);
-
-        solicitud.rechazar("No aplica para este proceso", admin);
+        solicitud.rechazar("No cumple requisitos");
 
         assertEquals(EstadoSolicitud.RECHAZADA, solicitud.getEstado());
     }
 
     /**
-     * No se puede rechazar si no está clasificada.
+     * No permite rechazar si no está clasificada.
      */
     @Test
-    void noDebeRechazarSiNoEstaClasificada() {
+    void noDebeRechazarSinClasificar() {
         assertThrows(IllegalStateException.class, () ->
-                solicitud.rechazar("Motivo válido", admin)
+                solicitud.rechazar("Motivo")
         );
     }
 
-    // ========================================================================================
-    // ---------------------------------REASIGNAR LA SOLICITUD---------------------------------
-    // ========================================================================================
+    // =============================================================================================
+    // ------------------------------------ REASIGNACIÓN -------------------------------------------
+    // =============================================================================================
 
     /**
-     * Permite reasignar el responsable.
+     * Permite reasignar el responsable en estado EN_ATENCION.
      */
     @Test
-    void adminDebeReasignarResponsable() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Impacto directo en el proceso académico"
-        );
+    void deberiaReasignarResponsable() {
+        solicitud.clasificar(new Prioridad("ALTA", "Urgente"));
+        solicitud.asignarResponsable(profesor);
 
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
+        Profesor otro = new Profesor("2", "Otro", new Email("otro@uni.com"));
 
-        Administrador otroAdmin = new Administrador(
-                "admin2",
-                "Otro Admin",
-                new Email("admin2@uniquindio.edu.co")
-        );
-
-        solicitud.reasignarResponsable(otroAdmin, admin);
+        solicitud.reasignarResponsable(otro);
 
         assertEquals(EstadoSolicitud.EN_ATENCION, solicitud.getEstado());
     }
 
-    // =======================================================================================
-    // -----------------------------CAMBIAR PRIORIDAD DE LA SOLICITUD-------------------------
-    // =======================================================================================
+    // =============================================================================================
+    // ------------------------------------ PRIORIDAD ----------------------------------------------
+    // =============================================================================================
 
     /**
-     * Permite cambiar la prioridad de la solicitud.
+     * Permite cambiar la prioridad mientras la solicitud no esté cerrada.
      */
     @Test
-    void adminDebeCambiarPrioridad() {
-        Prioridad nueva = new Prioridad(
-                "BAJA",
-                "No afecta procesos críticos del sistema"
-        );
-
-        solicitud.cambiarPrioridad(nueva, admin);
-
-        assertNotNull(solicitud.getHistorial());
+    void deberiaCambiarPrioridad() {
+        solicitud.cambiarPrioridad(new Prioridad("BAJA", "Menor impacto"));
     }
 
-    // ==========================================================================================
-    // ------------------------------------REABRIR LA SOLICITUD----------------------------------
-    // ==========================================================================================
+    // =============================================================================================
+    // ------------------------------------ REAPERTURA ---------------------------------------------
+    // =============================================================================================
 
     /**
      * Permite reabrir una solicitud cerrada.
      */
     @Test
-    void adminDebeReabrirSolicitud() {
-        Prioridad prioridad = new Prioridad(
-                "ALTA",
-                "Caso crítico que requiere seguimiento"
-        );
+    void deberiaReabrirSolicitud() {
+        solicitud.clasificar(new Prioridad("ALTA", "Urgente"));
+        solicitud.asignarResponsable(profesor);
+        solicitud.marcarComoAtendida();
+        solicitud.cerrar("ok");
 
-        solicitud.clasificar(prioridad, admin);
-        solicitud.asignarResponsable(profesor, admin);
-        solicitud.marcarComoAtendida(profesor);
-        solicitud.cerrar("Cierre correcto del caso", admin);
-
-        solicitud.reabrir("Se detectó un nuevo inconveniente", admin);
+        solicitud.reabrir("Nuevo inconveniente");
 
         assertEquals(EstadoSolicitud.EN_ATENCION, solicitud.getEstado());
     }
 
     /**
-     * No se puede reabrir si no está cerrada.
+     * No permite reabrir si la solicitud no está cerrada.
      */
     @Test
     void noDebeReabrirSiNoEstaCerrada() {
         assertThrows(IllegalStateException.class, () ->
-                solicitud.reabrir("Motivo válido para reapertura", admin)
+                solicitud.reabrir("Motivo")
         );
     }
 }

@@ -3,21 +3,24 @@ package co.edu.uniquindio.proyecto.domain.entity;
 import co.edu.uniquindio.proyecto.domain.valueobject.Email;
 
 /**
- * Representa un usuario con rol de estudiante dentro del sistema.
+ * Representa un estudiante dentro del sistema.
  *
- * <p>El estudiante es un tipo de {@link Usuario} que puede crear y
- * gestionar solicitudes académicas a través del sistema. Hereda
- * los atributos y comportamientos básicos definidos en la clase
- * Usuario.</p>
+ * <p>Un estudiante es un tipo de usuario que puede crear solicitudes
+ * académicas y hacer seguimiento a las mismas.</p>
  *
- * <p>Esta clase especializa el comportamiento de Usuario indicando
- * que su rol corresponde a <b>ESTUDIANTE</b>.</p>
+ * <p>Hereda las propiedades y comportamientos básicos de {@link Usuario},
+ * como identificación, nombre, correo electrónico y estado.</p>
  */
-
 public class Estudiante extends Usuario {
-    public Estudiante(String id, String nombre, Email email) {
-        super(id, nombre, email);
+
+    /**
+     * Crea un nuevo estudiante.
+     *
+     * @param identificacion identificador único del estudiante
+     * @param nombreCompleto nombre completo del estudiante
+     * @param email correo electrónico del estudiante
+     */
+    public Estudiante(String identificacion, String nombreCompleto, Email email) {
+        super(identificacion, nombreCompleto, email);
     }
-    @Override
-    public String getRol() { return "ESTUDIANTE"; }
 }

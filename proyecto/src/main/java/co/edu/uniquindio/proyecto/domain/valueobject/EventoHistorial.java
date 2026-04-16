@@ -26,6 +26,27 @@ public record EventoHistorial(
         EstadoSolicitud estadoRelacionado,
         Usuario actor
 ) {
+    // ============================GETTERS==============================
+
+    @Override
+    public LocalDateTime fecha() {
+        return fecha;
+    }
+
+    @Override
+    public String descripcion() {
+        return descripcion;
+    }
+
+    @Override
+    public EstadoSolicitud estadoRelacionado() {
+        return estadoRelacionado;
+    }
+
+    @Override
+    public Usuario actor() {
+        return actor;
+    }
 
     /**
      * Constructor compacto del record que valida los datos del evento.

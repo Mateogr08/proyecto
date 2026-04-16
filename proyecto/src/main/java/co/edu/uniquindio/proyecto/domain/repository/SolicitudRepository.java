@@ -7,11 +7,8 @@ import co.edu.uniquindio.proyecto.domain.valueobject.EstadoSolicitud;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface SolicitudRepository {
-
+    Solicitud buscarPorId(String id);
     void guardar(Solicitud solicitud);
-
-    Optional<Solicitud> buscarPorId(CodigoSolicitud id);
-
-    List<Solicitud> buscarPorEstado(EstadoSolicitud estado);
 }

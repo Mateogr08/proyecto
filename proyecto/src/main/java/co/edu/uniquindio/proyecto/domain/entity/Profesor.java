@@ -3,20 +3,24 @@ package co.edu.uniquindio.proyecto.domain.entity;
 import co.edu.uniquindio.proyecto.domain.valueobject.Email;
 
 /**
- * Representa un usuario con rol de profesor dentro del sistema.
+ * Representa un profesor dentro del sistema.
  *
- * <p>El profesor es un tipo de {@link Usuario} que puede participar
- * en la gestión o atención de solicitudes académicas dentro del sistema.
- * Hereda los atributos y comportamientos básicos definidos en la clase Usuario.</p>
+ * <p>Un profesor es un tipo de usuario que puede encargarse de la
+ * gestión y atención de solicitudes académicas, dependiendo del flujo
+ * definido en el sistema.</p>
  *
- * <p>Esta clase especializa el comportamiento de Usuario indicando
- * que su rol corresponde a <b>PROFESOR</b>.</p>
+ * <p>Hereda las propiedades comunes desde {@link Usuario}.</p>
  */
-
 public class Profesor extends Usuario {
-    public Profesor(String id, String nombre, Email email) {
-        super(id, nombre, email);
+
+    /**
+     * Crea un nuevo profesor.
+     *
+     * @param identificacion identificador único del profesor
+     * @param nombreCompleto nombre completo del profesor
+     * @param email correo electrónico del profesor
+     */
+    public Profesor(String identificacion, String nombreCompleto, Email email) {
+        super(identificacion, nombreCompleto, email);
     }
-    @Override
-    public String getRol() { return "PROFESOR"; }
 }

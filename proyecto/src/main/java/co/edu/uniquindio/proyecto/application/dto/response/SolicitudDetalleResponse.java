@@ -4,21 +4,35 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * DTO detallado de una solicitud
- * Mapea a: Solicitud
+ * DTO detallado de una solicitud.
  *
- * Incluye solo atributos relevantes para consulta de detalle
+ * <p>Contiene toda la información relevante del agregado Solicitud,
+ * incluyendo historial, responsables y fechas clave.</p>
  */
 public record SolicitudDetalleResponse(
 
-        String id,                     // ID de la solicitud
-        String tipoSolicitud,           // Nombre del tipo
-        String prioridad,               // Prioridad en texto
-        String estado,                  // Estado actual
-        String descripcion,             // Descripción del solicitante
-        String emailSolicitante,        // Solicitante
-        String emailResponsable,        // Responsable asignado (si existe)
-        LocalDateTime fechaCreacion,    // Fecha de creación
-        LocalDateTime fechaCierre,      // Fecha de cierre (si existe)
-        List<EventoHistorialResponse> historial // Historial de eventos
+        String id,
+
+        String tipo,
+
+        String descripcion,
+
+        String estado,
+
+        String prioridad,
+
+        String canal,
+
+        String solicitante,
+
+        String responsable,
+
+        LocalDateTime fechaCreacion,
+
+        LocalDateTime fechaAtencion,
+
+        LocalDateTime fechaCierre,
+
+        List<EventoHistorialResponse> historial
+
 ) {}
