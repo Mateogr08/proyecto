@@ -1,33 +1,37 @@
 package co.edu.uniquindio.proyecto.application.usecase;
 
-import co.edu.uniquindio.proyecto.domain.entity.*;
+import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
+import co.edu.uniquindio.proyecto.domain.entity.Usuario;
+import co.edu.uniquindio.proyecto.domain.exception.RecursoNoEncontradoException;
 import co.edu.uniquindio.proyecto.domain.repository.SolicitudRepository;
+import co.edu.uniquindio.proyecto.domain.repository.UsuarioRepository;
 import co.edu.uniquindio.proyecto.domain.service.GestionSolicitudService;
 
+/**
+ * Cierra una solicitud atendida.
+ */
 public class CerrarSolicitudUseCase {
 
     private final SolicitudRepository repository;
+    private final UsuarioRepository usuarioRepository;
     private final GestionSolicitudService service;
 
-    public CerrarSolicitudUseCase(SolicitudRepository repository,
-                                  GestionSolicitudService service) {
+    public CerrarSolicitudUseCase(SolicitudRepository repository, UsuarioRepository usuarioRepository, GestionSolicitudService service) {
         this.repository = repository;
+        this.usuarioRepository = usuarioRepository;
         this.service = service;
     }
 
-    /**
-     * Cierra una solicitud atendida.
-     *
-     * @param idSolicitud id de la solicitud
-     * @param observacion observación de cierre
-     * @param actor usuario que ejecuta la acción
-     */
-    public void ejecutar(String idSolicitud, String observacion, Usuario actor) {
+    public void ejecutar(String idSolicitud, String observacion, String idActor) {
 
-        Solicitud solicitud = repository.buscarPorId(idSolicitud);
+        Solicitud solicitud = repository.findById(idSolicitud)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + idSolicitud));
+
+        Usuario actor = usuarioRepository.findById(idActor)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Actor no encontrado con ID: " + idActor));
 
         service.cerrarSolicitud(solicitud, observacion, actor);
 
-        repository.guardar(solicitud);
+        repository.save(solicitud);
     }
 }

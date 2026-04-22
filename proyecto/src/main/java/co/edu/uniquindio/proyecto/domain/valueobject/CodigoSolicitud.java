@@ -24,7 +24,7 @@ public final class CodigoSolicitud {
      * o no cumple con el formato esperado (AAA-0000)
      */
     public CodigoSolicitud(String valor) {
-        if (valor == null || !valor.matches("^[A-Z]{3}-\\d{4}$")) {
+        if (valor == null || !valor.matches("^[A-Z]{3}-\\d{1,4}$")) {
             throw new IllegalArgumentException("Formato de código inválido (Ej: ABC-1234)");
         }
         this.valor = valor;

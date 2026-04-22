@@ -29,7 +29,7 @@ class UsuarioTest {
         Usuario estudiante = new Estudiante(
                 "1",
                 "Juan",
-                new Email("juan@uniquindio.edu.co")
+                new Email("juan@uniquindio.edu.co"),"98667"
         );
 
         assertTrue(estudiante.esEstudiante());
@@ -45,7 +45,7 @@ class UsuarioTest {
         Usuario admin = new Administrador(
                 "2",
                 "Ana",
-                new Email("admin@uniquindio.edu.co")
+                new Email("admin@uniquindio.edu.co"),"7658"
         );
 
         assertTrue(admin.esAdministrador());
@@ -61,7 +61,7 @@ class UsuarioTest {
         Usuario profesor = new Profesor(
                 "3",
                 "Carlos",
-                new Email("profesor@uniquindio.edu.co")
+                new Email("profesor@uniquindio.edu.co"),"764564"
         );
 
         assertTrue(profesor.esProfesor());
@@ -77,7 +77,7 @@ class UsuarioTest {
         Usuario usuario = new Estudiante(
                 "4",
                 "Laura",
-                new Email("laura@uniquindio.edu.co")
+                new Email("laura@uniquindio.edu.co"),"43546"
         );
 
         assertTrue(usuario.estaActivo());
@@ -97,13 +97,13 @@ class UsuarioTest {
         Usuario u1 = new Estudiante(
                 "123",
                 "Juan",
-                new Email("juan1@uni.com")
+                new Email("juan1@uni.com"),"123"
         );
 
         Usuario u2 = new Estudiante(
                 "123",
                 "Pedro",
-                new Email("juan2@uni.com")
+                new Email("juan2@uni.com"),"2345"
         );
 
         assertEquals(u1, u2);

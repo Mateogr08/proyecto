@@ -3,38 +3,43 @@ package co.edu.uniquindio.proyecto.application.usecase;
 import co.edu.uniquindio.proyecto.domain.entity.Solicitud;
 import co.edu.uniquindio.proyecto.domain.entity.Usuario;
 import co.edu.uniquindio.proyecto.domain.repository.SolicitudRepository;
+import co.edu.uniquindio.proyecto.domain.repository.UsuarioRepository;
+import co.edu.uniquindio.proyecto.domain.service.GeneradorCodigoService;
 import co.edu.uniquindio.proyecto.domain.valueobject.*;
 
+/**
+ * Caso de uso encargado de crear una nueva solicitud académica.
+ */
 public class CrearSolicitudUseCase {
 
     private final SolicitudRepository repository;
+    private final UsuarioRepository usuarioRepository;
+    private final GeneradorCodigoService generadorCodigo;
 
-    public CrearSolicitudUseCase(SolicitudRepository repository) {
+    public CrearSolicitudUseCase(SolicitudRepository repository, UsuarioRepository usuarioRepository, GeneradorCodigoService generadorCodigo) {
         this.repository = repository;
+        this.usuarioRepository = usuarioRepository;
+        this.generadorCodigo = generadorCodigo;
     }
 
-    /**
-     * Crea una nueva solicitud en el sistema.
-     *
-     * <p>Este caso de uso permite a un estudiante registrar una solicitud
-     * académica, la cual inicia en estado REGISTRADA.</p>
-     *
-     * @param id código de la solicitud
-     * @param tipo tipo de solicitud
-     * @param descripcion descripción del problema
-     * @param canal canal de origen
-     * @param solicitante usuario que crea la solicitud
-     */
-    public void ejecutar(CodigoSolicitud id,
-                         TipoSolicitud tipo,
+    public Solicitud ejecutar(String tipo,
                          String descripcion,
-                         CanalOrigen canal,
-                         Usuario solicitante) {
+                         String canal,
+                         String idSolicitante) {
+
+        Usuario solicitante = usuarioRepository.findById(idSolicitante)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Solicitante no encontrado: " + idSolicitante
+                ));
 
         Solicitud solicitud = new Solicitud(
-                id, tipo, descripcion, canal, solicitante
+                new CodigoSolicitud(generadorCodigo.generarCodigo()),
+                TipoSolicitud.of(tipo),
+                descripcion,
+                CanalOrigen.of(canal),
+                solicitante
         );
 
-        repository.guardar(solicitud);
+        return repository.save(solicitud);
     }
 }

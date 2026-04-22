@@ -40,7 +40,7 @@ class GestionSolicitudServiceTest {
         profesor = new Profesor("3", "Profe", new Email("p@u.com"));
 
         solicitud = new Solicitud(
-                new CodigoSolicitud("1"),
+                new CodigoSolicitud("SOL-001"),
                 TipoSolicitud.CONSULTA,
                 "Descripción",
                 CanalOrigen.WEB,
@@ -48,9 +48,9 @@ class GestionSolicitudServiceTest {
         );
 
         // Se lleva la solicitud a estado ATENDIDA
-        solicitud.clasificar(new Prioridad("ALTA", "Impacto"));
-        solicitud.asignarResponsable(profesor);
-        solicitud.marcarComoAtendida();
+        solicitud.clasificar(new Prioridad("ALTA", "Impacto detallado para la gestión de solicitudes"), admin);
+        solicitud.asignarResponsable(profesor, admin);
+        solicitud.marcarComoAtendida(profesor);
 
         service = new GestionSolicitudService();
     }
@@ -70,9 +70,18 @@ class GestionSolicitudServiceTest {
      */
     @Test
     void estudianteDebeCancelarSolicitud() {
-        service.cancelarSolicitud(solicitud, "Ya no es necesaria", estudiante);
+        // Crear una nueva solicitud que esté en estado REGISTRADA
+        Solicitud nuevaSolicitud = new Solicitud(
+                new CodigoSolicitud("SOL-002"),
+                TipoSolicitud.CONSULTA,
+                "Descripción de la nueva solicitud",
+                CanalOrigen.WEB,
+                estudiante
+        );
 
-        assertEquals(EstadoSolicitud.CANCELADA, solicitud.getEstado());
+        service.cancelarSolicitud(nuevaSolicitud, "Ya no es necesaria la solicitud", estudiante);
+
+        assertEquals(EstadoSolicitud.CANCELADA, nuevaSolicitud.getEstado());
     }
 
     /**
@@ -80,10 +89,21 @@ class GestionSolicitudServiceTest {
      */
     @Test
     void usuarioNoAutorizadoNoDebeCancelar() {
+        // Usar la solicitud del setUp que está en estado ATENDIDA lanzará IllegalStateException
+        // por el estado, pero primero se valida la autorización.
+        // Para probar autorización pura, usemos la nuevaSolicitud.
+        Solicitud nuevaSolicitud = new Solicitud(
+                new CodigoSolicitud("SOL-003"),
+                TipoSolicitud.CONSULTA,
+                "Descripción",
+                CanalOrigen.WEB,
+                estudiante
+        );
+        
         Profesor otro = new Profesor("4", "Otro", new Email("otro@u.com"));
 
         assertThrows(IllegalStateException.class, () ->
-                service.cancelarSolicitud(solicitud, "Motivo", otro)
+                service.cancelarSolicitud(nuevaSolicitud, "Motivo", otro)
         );
     }
 }

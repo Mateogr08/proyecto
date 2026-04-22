@@ -33,11 +33,11 @@ class ClasificadorSolicitudServiceTest {
      */
     @BeforeEach
     void setUp() {
-        estudiante = new Estudiante("1", "Juan", new Email("e@u.com"));
-        admin = new Administrador("2", "Admin", new Email("a@u.com"));
+        estudiante = new Estudiante("1", "Juan", new Email("e@u.com"),"1234");
+        admin = new Administrador("2", "Admin", new Email("a@u.com"),"1234");
 
         solicitud = new Solicitud(
-                new CodigoSolicitud("1"),
+                new CodigoSolicitud("SOL-001"),
                 TipoSolicitud.CONSULTA,
                 "Descripción",
                 CanalOrigen.WEB,
@@ -54,7 +54,7 @@ class ClasificadorSolicitudServiceTest {
     void adminDebeClasificarSolicitud() {
         service.clasificarSolicitud(
                 solicitud,
-                new Prioridad("ALTA", "Impacto crítico"),
+                new Prioridad("ALTA", "Impacto crítico detallado para la clasificación"),
                 admin
         );
 
@@ -69,7 +69,7 @@ class ClasificadorSolicitudServiceTest {
         assertThrows(IllegalStateException.class, () ->
                 service.clasificarSolicitud(
                         solicitud,
-                        new Prioridad("ALTA", "Impacto crítico"),
+                        new Prioridad("ALTA", "Impacto crítico detallado para la clasificación"),
                         estudiante
                 )
         );

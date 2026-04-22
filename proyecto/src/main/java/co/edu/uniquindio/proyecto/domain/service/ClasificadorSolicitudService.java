@@ -2,18 +2,12 @@ package co.edu.uniquindio.proyecto.domain.service;
 import co.edu.uniquindio.proyecto.domain.entity.*;
 import co.edu.uniquindio.proyecto.domain.valueobject.Prioridad;
 
+import org.springframework.stereotype.Service;
+
 /**
  * Servicio de dominio encargado de la clasificación de solicitudes.
- *
- * <p>Este servicio gestiona la asignación de prioridad a una solicitud,
- * asegurando que únicamente usuarios con rol de administrador puedan
- * ejecutar esta acción.</p>
- *
- * <p>Centraliza las reglas de negocio relacionadas con la clasificación,
- * separando las responsabilidades de autorización del agregado raíz.</p>
  */
-
-
+@Service
 public class ClasificadorSolicitudService {
 
     /**
@@ -39,6 +33,6 @@ public class ClasificadorSolicitudService {
             throw new IllegalStateException("Solo un administrador puede clasificar solicitudes");
         }
 
-        solicitud.clasificar(prioridad);
+        solicitud.clasificar(prioridad, actor);
     }
 }

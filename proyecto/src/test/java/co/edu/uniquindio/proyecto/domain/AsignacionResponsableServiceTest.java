@@ -35,12 +35,12 @@ class AsignacionResponsableServiceTest {
      */
     @BeforeEach
     void setUp() {
-        estudiante = new Estudiante("1", "Juan", new Email("e@u.com"));
-        admin = new Administrador("2", "Admin", new Email("a@u.com"));
-        profesor = new Profesor("3", "Profe", new Email("p@u.com"));
+        estudiante = new Estudiante("1", "Juan", new Email("e@u.com"),"123");
+        admin = new Administrador("2", "Admin", new Email("a@u.com"),"345");
+        profesor = new Profesor("3", "Profe", new Email("p@u.com"),"678");
 
         solicitud = new Solicitud(
-                new CodigoSolicitud("1"),
+                new CodigoSolicitud("SOL-001"),
                 TipoSolicitud.CONSULTA,
                 "Descripción",
                 CanalOrigen.WEB,
@@ -48,7 +48,7 @@ class AsignacionResponsableServiceTest {
         );
 
         // La solicitud debe estar clasificada antes de asignar responsable
-        solicitud.clasificar(new Prioridad("ALTA", "Impacto alto"));
+        solicitud.clasificar(new Prioridad("ALTA", "Impacto alto detallado para el servicio"), admin);
 
         service = new AsignacionResponsableService();
     }

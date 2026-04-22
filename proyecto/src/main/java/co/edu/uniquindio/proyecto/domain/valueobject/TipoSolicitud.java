@@ -79,4 +79,20 @@ public enum TipoSolicitud {
     public String getNombre() {
         return nombre;
     }
+
+    /**
+     * Obtiene el tipo de solicitud a partir de su nombre o valor.
+     *
+     * @param value valor del tipo de solicitud
+     * @return tipo de solicitud
+     * @throws IllegalArgumentException si el valor no coincide con ningún tipo
+     */
+    public static TipoSolicitud of(String value) {
+        for (TipoSolicitud tipo : TipoSolicitud.values()) {
+            if (tipo.name().equalsIgnoreCase(value) || tipo.nombre.equalsIgnoreCase(value)) {
+                return tipo;
+            }
+        }
+        throw new IllegalArgumentException("Tipo de solicitud no válido: " + value);
+    }
 }

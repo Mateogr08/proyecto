@@ -76,7 +76,7 @@ class ValueObjectsTest {
     @Test
     void deberiaCrearCodigoSolicitudValido() {
         assertDoesNotThrow(() ->
-                new CodigoSolicitud("SOL-123")
+                new CodigoSolicitud("SOL-001")
         );
     }
 

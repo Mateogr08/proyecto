@@ -18,5 +18,21 @@ public enum CanalOrigen {
     SAC,
     TELEFONICO,
     WEB,
-    PRESENCIAL
+    PRESENCIAL;
+
+    /**
+     * Obtiene el canal de origen a partir de su nombre.
+     *
+     * @param value nombre del canal
+     * @return canal de origen
+     * @throws IllegalArgumentException si el valor no coincide con ningún canal
+     */
+    public static CanalOrigen of(String value) {
+        for (CanalOrigen canal : CanalOrigen.values()) {
+            if (canal.name().equalsIgnoreCase(value)) {
+                return canal;
+            }
+        }
+        throw new IllegalArgumentException("Canal de origen no válido: " + value);
+    }
 }
